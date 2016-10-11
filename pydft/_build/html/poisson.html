@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="python">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Poisson Equation Solver &#8212; pydft 1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="pydft 1 documentation" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="poisson-equation-solver">
+<h1>Poisson Equation Solver<a class="headerlink" href="#poisson-equation-solver" title="Permalink to this headline">¶</a></h1>
+<p>Using DFT to find the energy of a system requires the ability to solve
+poission&#8217;s equation.</p>
+<div class="section" id="module-pydft.poisson">
+<span id="api-documentation"></span><h2>API Documentation<a class="headerlink" href="#module-pydft.poisson" title="Permalink to this headline">¶</a></h2>
+<p>This module contains methods used to solve the poisson equation.</p>
+<dl class="function">
+<dt id="pydft.poisson.charge_dist">
+<code class="descclassname">pydft.poisson.</code><code class="descname">charge_dist</code><span class="sig-paren">(</span><em>s</em>, <em>R</em>, <em>coeffs</em>, <em>sigmas</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydft/poisson.html#charge_dist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydft.poisson.charge_dist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the charge distribution for the system represented as
+a sumattion of gaussians.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first docutils">
+<dt>s (list of int): The number of samples points along each </dt>
+<dd>basis vector.</dd>
+</dl>
+<p class="last">R (numpy.ndarray): The basis vectors for the unit cell.
+coeffs (list of float): The coefficient for each gaussian.
+sigmas (list of float): The sigma values for each gaussian.</p>
+</dd>
+<dt>Returns:</dt>
+<dd><dl class="first last docutils">
+<dt>n (numpy.ndarray): The value of the charge distribution at each </dt>
+<dd>point in the space.</dd>
+</dl>
+</dd>
+<dt>Raises:</dt>
+<dd>ValueError: if the argument is not an <cite>int</cite> of <cite>float</cite>.</dd>
+<dt>Examples:</dt>
+<dd><p class="first">The following example finds the charge distribution contsructed 
+from two gaussians in a simple cubic unit cell. The distribution 
+is evaluated at such that there are 10 sample points in the R[0] 
+direction, 5 in the R[1] direction, and 15 in th R[2] directon. 
+The distribution is then constructed as:
+n(r) = coeff1*exp(-(r^2)/(2*sigma1^2))/(2*pi*sigma1^2)^(3/2) +
+coeff2*exp(-(r^2)/(2*sigma2^2))/(2*pi*sigma2^2)^(3/2)
+where r is the distance from each sample point to the center of
+the cell.</p>
+<div class="last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydft.poisson</span> <span class="k">import</span> <span class="n">charge_dist</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">15</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coeffs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sigmas</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">charge_dist</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">coeffs</span><span class="p">,</span><span class="n">sigmas</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pydft.poisson.poisson">
+<code class="descclassname">pydft.poisson.</code><code class="descname">poisson</code><span class="sig-paren">(</span><em>s</em>, <em>R</em>, <em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pydft/poisson.html#poisson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydft.poisson.poisson" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the solution to poisson&#8217;s equation.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first docutils">
+<dt>s (list of int): The number of samples points along each </dt>
+<dd>basis vector.</dd>
+</dl>
+<p>R (numpy.ndarray): The basis vectors for the unit cell.
+n (numpy.ndarray): The charge distribution evaluated at the</p>
+<blockquote class="last">
+<div>sample points.</div></blockquote>
+</dd>
+<dt>Returns:</dt>
+<dd><dl class="first last docutils">
+<dt>phi (numpy.ndaray): The value of the function phi at the</dt>
+<dd>sample points.</dd>
+</dl>
+</dd>
+<dt>Examples:</dt>
+<dd><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydft.poisson</span> <span class="k">import</span> <span class="n">charge_dist</span><span class="p">,</span> <span class="n">poisson</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">15</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coeffs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sigmas</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">charge_dist</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">coeffs</span><span class="p">,</span><span class="n">sigmas</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phi</span> <span class="o">=</span> <span class="n">poisson</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Poisson Equation Solver</a><ul>
+<li><a class="reference internal" href="#module-pydft.poisson">API Documentation</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/poisson.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Wiley Morgan.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/poisson.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
