@@ -8,7 +8,7 @@
     
     <title>pydft.poisson &#8212; pydft 1 documentation</title>
     
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -27,16 +27,22 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="top" title="pydft 1 documentation" href="../../index.html" />
-    <link rel="up" title="Module code" href="../index.html" />
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body role="document">
-  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pydft 1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -46,7 +52,6 @@
   <h1>Source code for pydft.poisson</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;This module contains methods used to solve the poisson equation.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">cmath</span>
 
 <span class="k">def</span> <span class="nf">_generate_M</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;This function finds the M matrix as described by</span>
@@ -183,8 +188,11 @@
 <span class="sd">    Args:</span>
 <span class="sd">        s (list of int): The number of samples points along each </span>
 <span class="sd">          basis vector.</span>
+
 <span class="sd">        R (numpy.ndarray): The basis vectors for the unit cell.</span>
+
 <span class="sd">        coeffs (list of float): The coefficient for each gaussian.</span>
+
 <span class="sd">        sigmas (list of float): The sigma values for each gaussian.</span>
 
 <span class="sd">    Returns:</span>
@@ -197,12 +205,12 @@
 <span class="sd">    Examples:</span>
 <span class="sd">        The following example finds the charge distribution contsructed </span>
 <span class="sd">        from two gaussians in a simple cubic unit cell. The distribution </span>
-<span class="sd">        is evaluated at such that there are 10 sample points in the R[0] </span>
-<span class="sd">        direction, 5 in the R[1] direction, and 15 in th R[2] directon. </span>
+<span class="sd">        is evaluated at such that there are `10` sample points in the `R[0]` </span>
+<span class="sd">        direction, `5` in the `R[1]` direction, and `15` in th `R[2]` directon. </span>
 <span class="sd">        The distribution is then constructed as:</span>
-<span class="sd">        n(r) = coeff1*exp(-(r^2)/(2*sigma1^2))/(2*pi*sigma1^2)^(3/2) +</span>
-<span class="sd">        coeff2*exp(-(r^2)/(2*sigma2^2))/(2*pi*sigma2^2)^(3/2)</span>
-<span class="sd">        where r is the distance from each sample point to the center of</span>
+<span class="sd">        :math:`n(r) = coeff_{1} \\frac{ \exp(\\frac{-r^2}{2 \sigma_1^2})}{(2 \pi \sigma_1^2)^{3/2}} +</span>
+<span class="sd">        coeff_2 \\frac{\exp(\\frac{-r^2}{2 \sigma_2^2})}{(2 \pi \sigma_2^2)^{3/2}}`</span>
+<span class="sd">        where `r` is the distance from each sample point to the center of</span>
 <span class="sd">        the cell.</span>
 
 <span class="sd">        &gt;&gt;&gt; from pydft.poisson import charge_dist</span>
@@ -281,56 +289,54 @@
     <span class="n">G</span> <span class="o">=</span> <span class="n">_generate_G</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
     <span class="n">G2</span> <span class="o">=</span> <span class="n">_find_Gsqu</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
     <span class="n">G2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
-    <span class="n">Linv</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">G2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">R</span><span class="p">))</span>
+    <span class="n">Linv</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">G2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">R</span><span class="p">)))</span>
     <span class="n">Linv</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Linv</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">result</span>
 
-<span class="k">def</span> <span class="nf">_B_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_B_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Applies the cI (I call it B) operator to the vector v.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        n (numpy.ndarray): The sample points in the periodic cell.</span>
-<span class="sd">        m (numpy.ndarray): The sample points in the unshifted cell.</span>
 <span class="sd">        s (list of int): The number of samples points along each </span>
 <span class="sd">          basis vector.</span>
+<span class="sd">        R (numpy.ndarray): A matrix conaining the lattice</span>
+<span class="sd">          vectors. Each row is a different lattice vector.</span>
 <span class="sd">        v (numpy.ndarray):  1D array of the vector to operate on.</span>
 <span class="sd">    </span>
 <span class="sd">    Returns:</span>
 <span class="sd">        result (numpy.ndarray): The result of B operating on v.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="n">_generate_N</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
-    <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">_generate_M</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
-    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">cmath</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">),</span><span class="n">m</span><span class="p">)))</span>
+    <span class="c1"># n = _generate_N(s)</span>
+    <span class="c1"># m = np.transpose(_generate_M(s))</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">_generate_r</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">_generate_G</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">G</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">r</span><span class="p">)))</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">B</span><span class="p">,</span><span class="n">v</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">result</span>
 
-<span class="k">def</span> <span class="nf">_Bj_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_Bj_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Applies the cI (I call it B) operator to the vector v.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        n (numpy.ndarray): The sample points in the periodic cell.</span>
-<span class="sd">        m (numpy.ndarray): The sample points in the unshifted cell.</span>
 <span class="sd">        s (list of int): The number of samples points along each </span>
 <span class="sd">          basis vector.</span>
+<span class="sd">        R (numpy.ndarray): A matrix conaining the lattice</span>
+<span class="sd">          vectors. Each row is a different lattice vector.</span>
 <span class="sd">        v (numpy.ndarray):  1D array of the vector to operate on.</span>
 <span class="sd">    </span>
 <span class="sd">    Returns:</span>
 <span class="sd">        result (numpy.ndarray): The result of B operating on v.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="n">_generate_N</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
-    <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">_generate_M</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;M&quot;</span><span class="p">,</span><span class="n">m</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;N&quot;</span><span class="p">,</span><span class="n">n</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">cmath</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">),</span><span class="n">m</span><span class="p">))</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">)))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span><span class="n">B</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">cmath</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">),</span><span class="n">m</span><span class="p">))</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">)))</span>
-    <span class="c1"># print(&quot;Bconj&quot;,B.conj())</span>
-    <span class="n">Bj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">cmath</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">m</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">)),</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">n</span><span class="p">))</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">)))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bj&quot;</span><span class="p">,</span><span class="n">Bj</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bj&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">cmath</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">m</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">)),</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">n</span><span class="p">))</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">)))</span>
+    <span class="c1"># n = _generate_N(s)</span>
+    <span class="c1"># m = np.transpose(_generate_M(s))</span>
+    <span class="c1"># B = np.exp(2j*np.pi*np.dot(n,np.dot(np.diag(s),m)))</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">_generate_r</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">_generate_G</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">G</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">r</span><span class="p">)))</span>
+    <span class="n">Bj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">conjugate</span><span class="p">())</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Bj</span><span class="p">,</span><span class="n">v</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">result</span>
@@ -341,8 +347,10 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        s (list of int): The number of samples points along each </span>
-<span class="sd">          basis vector.</span>
+<span class="sd">           basis vector.</span>
+
 <span class="sd">        R (numpy.ndarray): The basis vectors for the unit cell.</span>
+
 <span class="sd">        n (numpy.ndarray): The charge distribution evaluated at the</span>
 <span class="sd">          sample points.</span>
 
@@ -362,7 +370,7 @@
 <span class="sd">        &gt;&gt;&gt; phi = poisson(s,R,n)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">phi</span> <span class="o">=</span> <span class="n">_B_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">_Linv_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="o">-</span><span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">_O_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">_Bj_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">n</span><span class="p">))))</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">_B_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">_Linv_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="o">-</span><span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">_O_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">_Bj_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">n</span><span class="p">))))</span>
 
     <span class="k">return</span> <span class="n">phi</span></div>
 </pre></div>
@@ -371,15 +379,7 @@
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="../index.html">Module code</a><ul>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
+        <div class="sphinxsidebarwrapper">
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
@@ -394,17 +394,22 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2016, Wiley Morgan.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.8</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
-      
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pydft 1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
     </div>
-
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Wiley Morgan.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+    </div>
   </body>
 </html>
