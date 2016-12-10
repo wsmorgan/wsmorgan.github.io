@@ -1,0 +1,317 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="python">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pydft.ewald &#8212; pydft 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="pydft 1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pydft 1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pydft.ewald</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Contains the code needed to find the Ewald energy of the system.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">product</span>
+
+<span class="k">def</span> <span class="nf">_find_structure_factor</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">G</span><span class="p">):</span> <span class="c1">#pragma: no cover</span>
+    <span class="sd">&quot;&quot;&quot;Finds the structure factors for the system.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x (list of float): The locations of the nuclear charges.</span>
+<span class="sd">        z (list of float): The strength of each charge in atomic units.</span>
+<span class="sd">        G (numpy.ndarray): The G vector for the system.</span>
+
+<span class="sd">    Retruns:</span>
+<span class="sd">        S (list of float): The structure factors for the system.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">G</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">x</span><span class="p">))),</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">S</span>
+
+<span class="k">def</span> <span class="nf">_nuclear_charge_density</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="n">sigma</span><span class="p">,</span><span class="n">dr</span><span class="p">,</span><span class="n">sf</span><span class="p">,</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">):</span> <span class="c1">#pragma: no cover</span>
+    <span class="sd">&quot;&quot;&quot;Finds the nuclear charge density for the desired nuclei.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        z (float): The strength of each charge.</span>
+<span class="sd">        sigma (float): The sigma for the gaussian.</span>
+<span class="sd">        dr (list of float): The between each point and the </span>
+<span class="sd">           center of the cell.</span>
+<span class="sd">        sf (float): The structure factor for the cell.</span>
+<span class="sd">        s (list of int): The number of samples points along each </span>
+<span class="sd">          basis vector.</span>
+<span class="sd">        R (numpy.ndarray): A matrix conaining the lattice</span>
+<span class="sd">          vectors. Each row is a different lattice vector.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        n (numpy.ndarray): The charge density for this nucleus.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">pydft.poisson</span> <span class="k">import</span> <span class="n">_gaussian</span><span class="p">,</span> <span class="n">_B_operator</span><span class="p">,</span> <span class="n">_Bj_operator</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">z</span><span class="o">*</span><span class="n">_gaussian</span><span class="p">(</span><span class="n">dr</span><span class="p">,</span><span class="n">sigma</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">_B_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">_Bj_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">g</span><span class="p">)</span><span class="o">*</span><span class="n">sf</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">n</span>
+
+<span class="k">def</span> <span class="nf">ewald_energy_arias</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">s</span><span class="p">,</span><span class="n">sigmas</span><span class="p">):</span> <span class="c1">#pragma: no cover</span>
+    <span class="sd">&quot;&quot;&quot;Finds the ewald energy of the system, i.e. Unn, using the</span>
+<span class="sd">    approximation described by Thomas Arias. </span>
+
+<span class="sd">    Don&#39;t use this method. I&#39;ve never gotten it to work properly and</span>
+<span class="sd">    the exact method provides better results.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        z (list of float): The strength of each nucleus.</span>
+<span class="sd">        x (list of list of float): The location of each nucleus.</span>
+<span class="sd">        sigmas (list of float): The width of the gaussians for </span>
+<span class="sd">          the charge distribution.</span>
+<span class="sd">        s (list of int): The number of samples points along each </span>
+<span class="sd">          basis vector.</span>
+<span class="sd">        R (numpy.ndarray): A matrix conaining the lattice</span>
+<span class="sd">          vectors. Each row is a different lattice vector.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Unum (float): The ewald energy for the interacting nuclei.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">pydft.poisson</span> <span class="k">import</span> <span class="n">_find_dr</span><span class="p">,</span> <span class="n">_generate_r</span><span class="p">,</span> <span class="n">_generate_G</span><span class="p">,</span> <span class="n">poisson</span><span class="p">,</span> <span class="n">_Bj_operator</span><span class="p">,</span> <span class="n">_O_operator</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">_generate_G</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">Sf</span> <span class="o">=</span> <span class="n">_find_structure_factor</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">G</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">_generate_r</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">dr</span> <span class="o">=</span> <span class="n">_find_dr</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">R</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">z</span><span class="p">)):</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_nuclear_charge_density</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">sigmas</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">dr</span><span class="p">,</span><span class="n">Sf</span><span class="p">,</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">))</span>
+        <span class="n">phi</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">poisson</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">n</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+    <span class="n">Unum</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">z</span><span class="p">)):</span>
+        <span class="n">Unum</span> <span class="o">+=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">_Bj_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">phi</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">_O_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">_Bj_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">n</span><span class="p">[</span><span class="n">i</span><span class="p">])))))</span>
+
+    <span class="k">return</span> <span class="n">Unum</span>
+
+<span class="k">def</span> <span class="nf">_find_alpha</span><span class="p">(</span><span class="n">Rc</span><span class="p">,</span><span class="n">accuracy</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finds the ewald summation paramater alpha from the cutoff radius.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        Rc (float): The cutoff radius for the summation.</span>
+<span class="sd">        accuracy (float): The desired accuracy for the summation.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">       alpha (float): The summation parameter alpha.</span>
+<span class="sd">       kc (float): The cutoff radius in reciprical space.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">accuracy</span><span class="p">)))</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">p</span><span class="o">/</span><span class="n">Rc</span>
+    <span class="n">kc</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">alpha</span><span class="o">*</span><span class="n">p</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">kc</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_phi_real</span><span class="p">(</span><span class="n">zs</span><span class="p">,</span><span class="n">rs</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span> <span class="n">Rc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finds the real space portion of the ewald summation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        zs (list of int): The amount of charge on each nucleus.</span>
+<span class="sd">        rs (list of list of float): Each entry contains the position of an atom.</span>
+<span class="sd">        R (list of list of float): The lattice vectors.</span>
+<span class="sd">        alpha (float): The ewald summation parameter.</span>
+<span class="sd">        Rc (float): The cutoff radius for the summation.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Ur (float): The energy contribution of the real portion of the sum.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">erfc</span>
+    <span class="n">Ur</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># Find the real space points within the cutoff</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Rc</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="p">,[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])))))</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">neighbs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span><span class="n">repeat</span><span class="o">=</span><span class="mi">3</span><span class="p">))])</span>
+    <span class="n">neighbs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">neighbs</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">for</span> <span class="n">n_L</span> <span class="ow">in</span> <span class="n">neighbs</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">a_i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">zs</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">a_j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">zs</span><span class="p">)):</span>
+                <span class="c1"># We have to handle the central atom differently than</span>
+                <span class="c1"># the rest of the sum.</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">n_L</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">a_i</span> <span class="o">!=</span> <span class="n">a_j</span><span class="p">):</span>
+                    <span class="n">rijn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">rs</span><span class="p">[</span><span class="n">a_i</span><span class="p">]</span><span class="o">-</span><span class="n">rs</span><span class="p">[</span><span class="n">a_j</span><span class="p">])</span>
+                    <span class="n">Ur</span> <span class="o">+=</span> <span class="n">zs</span><span class="p">[</span><span class="n">a_i</span><span class="p">]</span><span class="o">*</span><span class="n">zs</span><span class="p">[</span><span class="n">a_j</span><span class="p">]</span><span class="o">*</span><span class="n">erfc</span><span class="p">(</span><span class="n">alpha</span> <span class="o">*</span><span class="n">rijn</span><span class="p">)</span><span class="o">/</span><span class="n">rijn</span>
+                <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">n_L</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span> 
+                    <span class="n">rijn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">rs</span><span class="p">[</span><span class="n">a_i</span><span class="p">]</span><span class="o">-</span><span class="n">rs</span><span class="p">[</span><span class="n">a_j</span><span class="p">]</span><span class="o">+</span><span class="n">n_L</span><span class="p">)</span>
+                    <span class="n">Ur</span> <span class="o">+=</span> <span class="n">zs</span><span class="p">[</span><span class="n">a_i</span><span class="p">]</span><span class="o">*</span><span class="n">zs</span><span class="p">[</span><span class="n">a_j</span><span class="p">]</span><span class="o">*</span><span class="n">erfc</span><span class="p">(</span><span class="n">alpha</span> <span class="o">*</span><span class="n">rijn</span><span class="p">)</span><span class="o">/</span><span class="n">rijn</span>
+                    
+    <span class="k">return</span> <span class="n">Ur</span><span class="o">/</span><span class="mf">2.</span>
+
+<span class="k">def</span> <span class="nf">_phi_recip</span><span class="p">(</span><span class="n">zs</span><span class="p">,</span><span class="n">rs</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">kc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finds the reciprocal space portion of the ewald summation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        zs (list of int): The amount of charge on each nucleus.</span>
+<span class="sd">        rs (list of list of float): Each entry contains the position of an atom.</span>
+<span class="sd">        R (list of list of float): The lattice vectors.</span>
+<span class="sd">        alpha (float): The ewald summation parameter.</span>
+<span class="sd">        kc (float): The cutoff radius for the summation.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Um (float): The energy contribution of the reciprocal portion of the sum.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">cmath</span> <span class="k">import</span> <span class="n">exp</span>
+    
+    <span class="n">Um</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Find the needed reciprical space points within the cutoff</span>
+    <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">R</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">R</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="n">k1</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">R</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">R</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="n">V</span>
+    <span class="n">k2</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">R</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">R</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="n">V</span>
+    <span class="n">k3</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">R</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">R</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="n">V</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">k1</span><span class="p">,</span><span class="n">k2</span><span class="p">,</span><span class="n">k3</span><span class="p">])</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">kc</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">K</span><span class="p">,[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])))</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span>
+    <span class="n">ms</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">K</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">product</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">m</span><span class="p">,</span><span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">)),</span><span class="n">repeat</span><span class="o">=</span><span class="mi">3</span><span class="p">))]</span>
+
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">ms</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">m</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">a_i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">zs</span><span class="p">)):</span>
+                <span class="k">for</span> <span class="n">a_j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">zs</span><span class="p">)):</span>
+                    <span class="n">Um</span> <span class="o">+=</span> <span class="n">zs</span><span class="p">[</span><span class="n">a_i</span><span class="p">]</span><span class="o">*</span><span class="n">zs</span><span class="p">[</span><span class="n">a_j</span><span class="p">]</span><span class="o">*</span> <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">m</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">alpha</span><span class="o">*</span><span class="n">alpha</span><span class="p">))</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">rs</span><span class="p">[</span><span class="n">a_i</span><span class="p">]</span><span class="o">-</span><span class="n">rs</span><span class="p">[</span><span class="n">a_j</span><span class="p">]))</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">m</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">Um</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">V</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_phi_rem</span><span class="p">(</span><span class="n">zs</span><span class="p">,</span><span class="n">alpha</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finds the energy missed by the real and reciprocal sums.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        zs (list of int): The amount of charge on each nucleus.</span>
+<span class="sd">        alpha (float): The ewald summation parameter.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Uo (float): The energy missing energy controbution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+        
+    <span class="n">Uo</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">zs</span><span class="p">:</span>
+        <span class="n">Uo</span> <span class="o">+=</span> <span class="n">z</span><span class="o">*</span><span class="n">z</span>
+
+    <span class="n">Uo</span> <span class="o">=</span> <span class="o">-</span><span class="n">alpha</span><span class="o">*</span><span class="n">Uo</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">Uo</span>
+
+<div class="viewcode-block" id="ewald_energy_exact"><a class="viewcode-back" href="../../ewald.html#pydft.ewald.ewald_energy_exact">[docs]</a><span class="k">def</span> <span class="nf">ewald_energy_exact</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">R</span><span class="p">,</span> <span class="n">Rc</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">accuracy</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finds the ewald energy using the exact approach as described in</span>
+<span class="sd">    these papers:</span>
+
+<span class="sd">    Plain Ewald and PME by Thierry Matthey.</span>
+
+<span class="sd">    Ewald summation techniques in perspective: a survey by Abdulnour</span>
+<span class="sd">    Y. Toukmaji and John A. Board Jr.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        z (list of float): The strength of each nucleus.</span>
+<span class="sd">        x (list of list of float): The location of each nucleus.</span>
+<span class="sd">        R (numpy.ndarray): A matrix conaining the lattice</span>
+<span class="sd">          vectors. Each row is a different lattice vector.</span>
+<span class="sd">        Rc (float): (Optional) The cutoff radius for the sum.</span>
+
+<span class="sd">    Returns: </span>
+<span class="sd">        Unum (float): The ewald energy for the interacting nuclei.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">R</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">R</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="c1"># if the cutoff radius isn&#39;t given then we assume that we want all</span>
+    <span class="c1"># the atom&#39;s within 1 lattice parameter of the center of the cell.</span>
+    <span class="k">if</span> <span class="n">Rc</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">Rc</span> <span class="o">=</span> <span class="n">V</span><span class="o">**</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">kc</span><span class="p">)</span> <span class="o">=</span> <span class="n">_find_alpha</span><span class="p">(</span><span class="n">Rc</span><span class="p">,</span><span class="n">accuracy</span><span class="p">)</span>
+
+    <span class="n">Ur</span> <span class="o">=</span> <span class="n">_phi_real</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">Rc</span><span class="p">)</span>
+    <span class="n">Um</span> <span class="o">=</span> <span class="n">_phi_recip</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">kc</span><span class="p">)</span>
+    <span class="n">Uo</span> <span class="o">=</span> <span class="n">_phi_rem</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="n">alpha</span><span class="p">)</span>
+
+    <span class="n">Unum</span> <span class="o">=</span> <span class="n">Ur</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">Um</span><span class="p">)</span><span class="o">+</span><span class="n">Uo</span>
+
+    <span class="k">return</span> <span class="n">Unum</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pydft 1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Wiley Morgan.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+    </div>
+  </body>
+</html>

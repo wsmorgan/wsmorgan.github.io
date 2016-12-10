@@ -200,7 +200,8 @@
 <span class="sd">         point in the space.</span>
 
 <span class="sd">    Raises:</span>
-<span class="sd">        ValueError: if the argument is not an `int` of `float`.</span>
+<span class="sd">        ValueError: if the number of coefficients doesn&#39;t match the number of sigmas, i.e.,</span>
+<span class="sd">          len(ceoffs) != len(sigmas).</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        The following example finds the charge distribution contsructed </span>
@@ -301,19 +302,13 @@
 <span class="sd">    Args:</span>
 <span class="sd">        s (list of int): The number of samples points along each </span>
 <span class="sd">          basis vector.</span>
-<span class="sd">        R (numpy.ndarray): A matrix conaining the lattice</span>
-<span class="sd">          vectors. Each row is a different lattice vector.</span>
 <span class="sd">        v (numpy.ndarray):  1D array of the vector to operate on.</span>
 <span class="sd">    </span>
 <span class="sd">    Returns:</span>
 <span class="sd">        result (numpy.ndarray): The result of B operating on v.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># n = _generate_N(s)</span>
-    <span class="c1"># m = np.transpose(_generate_M(s))</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="n">_generate_r</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
-    <span class="n">G</span> <span class="o">=</span> <span class="n">_generate_G</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
-    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">G</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">r</span><span class="p">)))</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">B</span><span class="p">,</span><span class="n">v</span><span class="p">)</span>
+    
+    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">),</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">result</span>
 
@@ -333,11 +328,11 @@
     <span class="c1"># n = _generate_N(s)</span>
     <span class="c1"># m = np.transpose(_generate_M(s))</span>
     <span class="c1"># B = np.exp(2j*np.pi*np.dot(n,np.dot(np.diag(s),m)))</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="n">_generate_r</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
-    <span class="n">G</span> <span class="o">=</span> <span class="n">_generate_G</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
-    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">G</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">r</span><span class="p">)))</span>
-    <span class="n">Bj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">conjugate</span><span class="p">())</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Bj</span><span class="p">,</span><span class="n">v</span><span class="p">)</span>
+    <span class="c1"># r = _generate_r(R,s)</span>
+    <span class="c1"># G = _generate_G(R,s)</span>
+    <span class="c1"># B = np.exp(1j*np.dot(G,np.transpose(r)))</span>
+    <span class="c1"># Bj = np.transpose(B.conjugate())/np.prod(s)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftn</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">),</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">)</span><span class="c1">#np.dot(Bj,v)</span>
 
     <span class="k">return</span> <span class="n">result</span>
 
