@@ -242,7 +242,7 @@
 <span class="sd">        s (list of int): The number of samples points along each </span>
 <span class="sd">          basis vector.</span>
 <span class="sd">        R (numpy.ndarray): The basis vectors for the unit cell.</span>
-<span class="sd">        v (numpy.ndarray):  1D array of the vector to operate on.</span>
+<span class="sd">        v (numpy.ndarray): array of the vector or matrix to operate on.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        result (numpy.ndarray): The result of O operating on v.</span>
@@ -251,7 +251,13 @@
     <span class="n">dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
     <span class="n">detR</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
     <span class="n">O</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span><span class="o">*</span><span class="n">detR</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">O</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nb">list</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">Ns</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">T</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">O</span><span class="p">,</span> <span class="n">Ns</span><span class="p">))</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">O</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
     
     <span class="k">return</span> <span class="n">result</span>
 
@@ -262,7 +268,7 @@
 <span class="sd">        s (list of int): The number of samples points along each </span>
 <span class="sd">          basis vector.</span>
 <span class="sd">        R (numpy.ndarray): The basis vectors for the unit cell.</span>
-<span class="sd">        v (numpy.ndarray):  1D array of the vector to operate on.</span>
+<span class="sd">        v (numpy.ndarray):  array of the vector or matrix to operate on.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        result (numpy.ndarray): The result of L operating on v.</span>
@@ -271,7 +277,13 @@
     <span class="n">G</span> <span class="o">=</span> <span class="n">_generate_G</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
     <span class="n">G2</span> <span class="o">=</span> <span class="n">_find_Gsqu</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
     <span class="n">L</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">R</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nb">list</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">Ns</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">T</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">Ns</span><span class="p">))</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
     
     <span class="k">return</span> <span class="n">result</span>
 
@@ -302,13 +314,24 @@
 <span class="sd">    Args:</span>
 <span class="sd">        s (list of int): The number of samples points along each </span>
 <span class="sd">          basis vector.</span>
-<span class="sd">        v (numpy.ndarray):  1D array of the vector to operate on.</span>
+<span class="sd">        R (numpy.ndarray): A matrix conaining the lattice</span>
+<span class="sd">          vectors. Each row is a different lattice vector.</span>
+<span class="sd">        v (numpy.ndarray):  array of the vector or matrix to operate on.</span>
 <span class="sd">    </span>
 <span class="sd">    Returns:</span>
 <span class="sd">        result (numpy.ndarray): The result of B operating on v.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
-    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">),</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nb">list</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">Ns</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">T</span><span class="p">:</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">Ns</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">),</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">))</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">),</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">result</span>
 
@@ -323,19 +346,76 @@
 <span class="sd">        v (numpy.ndarray):  1D array of the vector to operate on.</span>
 <span class="sd">    </span>
 <span class="sd">    Returns:</span>
-<span class="sd">        result (numpy.ndarray): The result of B operating on v.</span>
+<span class="sd">        result (numpy.ndarray): The result of Bj operating on v.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># n = _generate_N(s)</span>
-    <span class="c1"># m = np.transpose(_generate_M(s))</span>
-    <span class="c1"># B = np.exp(2j*np.pi*np.dot(n,np.dot(np.diag(s),m)))</span>
-    <span class="c1"># r = _generate_r(R,s)</span>
-    <span class="c1"># G = _generate_G(R,s)</span>
-    <span class="c1"># B = np.exp(1j*np.dot(G,np.transpose(r)))</span>
-    <span class="c1"># Bj = np.transpose(B.conjugate())/np.prod(s)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftn</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">),</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">)</span><span class="c1">#np.dot(Bj,v)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nb">list</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftn</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">Ns</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">T</span><span class="p">:</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftn</span><span class="p">(</span><span class="n">Ns</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">),</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">))</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftn</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">),</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">result</span>
 
+<span class="k">def</span> <span class="nf">_B_dag_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">v</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Applies the cIdag operator to the matrix Ns.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        s (list of int): The number of samples points along each </span>
+<span class="sd">          basis vector.</span>
+<span class="sd">        R (numpy.ndarray): A matrix conaining the lattice</span>
+<span class="sd">          vectors. Each row is a different lattice vector.</span>
+<span class="sd">        v (numpy.ndarray):  An array containing the vector or matrix being operated on.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        result (numpy.ndarray): The result of Bdag operating on Ns.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nb">list</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftn</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">Ns</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">T</span><span class="p">:</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftn</span><span class="p">(</span><span class="n">Ns</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">),</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">))</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftn</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">),</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_Bj_dag_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Applies the cI (I call it B) operator to the matrix Ns.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        s (list of int): The number of samples points along each </span>
+<span class="sd">          basis vector.</span>
+<span class="sd">        R (numpy.ndarray): A matrix conaining the lattice</span>
+<span class="sd">          vectors. Each row is a different lattice vector.</span>
+<span class="sd">        v (numpy.ndarray):  An array containing the matrix being operated on.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        result (numpy.ndarray): The result of Bj operating on Ns.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nb">list</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">Ns</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">T</span><span class="p">:</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">Ns</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">),</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">))</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">),</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 
 <div class="viewcode-block" id="poisson"><a class="viewcode-back" href="../../poisson.html#pydft.poisson.poisson">[docs]</a><span class="k">def</span> <span class="nf">poisson</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Calculates the solution to poisson&#39;s equation.</span>

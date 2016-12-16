@@ -1,0 +1,391 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="python">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pydft.schrodinger &#8212; pydft 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="pydft 1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pydft 1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pydft.schrodinger</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Contains the code needed to solve the schrodinger equation.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">_sho_V</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">w</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The potential for the position x of the simple harmonic oscillator.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        r (numpy.ndarray): The location of the desired potential.</span>
+<span class="sd">        w (float, optional): The frequency of the simple harmonic oscillator.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        V (float): The potential at r.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">V</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">w</span><span class="o">*</span><span class="n">w</span><span class="o">*</span><span class="n">r</span><span class="o">**</span><span class="mi">2</span>
+
+    <span class="k">return</span> <span class="n">V</span>
+
+<span class="k">def</span> <span class="nf">_diagouter</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finds the diagonal of the outer product of two matrices.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        A (numpy.ndarray): A matrix.</span>
+<span class="sd">        B (numpy.ndarray): B matrix.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        c (np.ndarray): The diagonal of A.dag(B).</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the two matrices don&#39;t have the same shape.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">B</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">B</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="nb">len</span><span class="p">(</span><span class="n">B</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">B</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The two input matrices must have the same shape.&quot;</span><span class="p">)</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">)):</span>
+        <span class="n">c_i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+            <span class="n">c_i</span> <span class="o">+=</span> <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">n</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">B</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">n</span><span class="p">])</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c_i</span><span class="p">)</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">c</span>
+
+<span class="k">def</span> <span class="nf">_getE</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="n">V</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The sum of the energies for the states present in the solution.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        s (list of int): The number of samples points along each </span>
+<span class="sd">          basis vector.</span>
+<span class="sd">        R (numpy.ndarray): The basis vectors for the unit cell.</span>
+<span class="sd">        W (numpy.ndarray): A matrix containing the expansion coefficients </span>
+<span class="sd">          for the wavefunctions</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        E (numpy.ndarray): A vector of the energies at the sample points.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">pydft.poisson</span> <span class="k">import</span> <span class="n">_O_operator</span><span class="p">,</span> <span class="n">_L_operator</span><span class="p">,</span> <span class="n">_B_operator</span>
+
+    <span class="k">if</span> <span class="n">V</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span> <span class="c1">#pragma: no cover</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">_sho_V</span>
+
+    <span class="n">O_t</span> <span class="o">=</span> <span class="n">_O_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">W</span><span class="p">)</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">W</span><span class="o">.</span><span class="n">T</span><span class="p">),</span><span class="n">_O_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">W</span><span class="p">))</span>
+    <span class="n">Vt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">_Vdual</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">V</span><span class="p">)))</span>
+
+    <span class="n">IW</span> <span class="o">=</span> <span class="n">_B_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">W</span><span class="p">)</span>
+    <span class="n">Uinv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
+    <span class="n">IWU</span> <span class="o">=</span> <span class="n">_B_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W</span><span class="p">,</span><span class="n">Uinv</span><span class="p">))</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">_diagouter</span><span class="p">(</span><span class="n">IW</span><span class="p">,</span><span class="n">IWU</span><span class="p">)</span>
+
+    <span class="n">Ew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">W</span><span class="p">)),</span><span class="n">_L_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W</span><span class="p">,</span><span class="n">Uinv</span><span class="p">))))</span>
+
+    <span class="n">E</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="p">)</span><span class="o">*</span><span class="n">Ew</span><span class="o">/</span><span class="mf">2.</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Vt</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">E</span>
+
+<span class="k">def</span> <span class="nf">_Vdual</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">V</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finds the dual of the potential matrix.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        s (list of int): The number of samples points along each </span>
+<span class="sd">          basis vector.</span>
+<span class="sd">        R (numpy.ndarray): The basis vectors for the unit cell.</span>
+<span class="sd">        V (function, optional): The function that defines the potential.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Vdual (numpy.ndarray): The dual of the potential matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="kn">from</span> <span class="nn">pydft.poisson</span> <span class="k">import</span> <span class="n">_Bj_dag_operator</span><span class="p">,</span> <span class="n">_O_operator</span><span class="p">,</span> <span class="n">_Bj_operator</span><span class="p">,</span> <span class="n">_generate_r</span><span class="p">,</span> <span class="n">_find_dr</span>
+
+    <span class="k">if</span> <span class="n">V</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span> <span class="c1">#pragma: no cover</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">_sho_V</span>
+
+    <span class="n">r</span> <span class="o">=</span> <span class="n">_generate_r</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">dr</span> <span class="o">=</span> <span class="n">_find_dr</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">R</span><span class="p">)</span>
+    <span class="n">Vs</span> <span class="o">=</span> <span class="n">V</span><span class="p">(</span><span class="n">dr</span><span class="p">)</span>
+    <span class="n">Vdual</span> <span class="o">=</span> <span class="n">_Bj_dag_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">_O_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">_Bj_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">Vs</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="n">Vdual</span>
+
+<span class="k">def</span> <span class="nf">_diagprod</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">B</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finds the diagonal product of the vector a with the matrix B.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        a (numpy.ndarray): The vector a of the diagonal product.</span>
+<span class="sd">        B (numpy.ndarray): The matrix B of the diagonal product.</span>
+
+<span class="sd">    Retruns:</span>
+<span class="sd">        dp (numpy.ndarray): The matrix output of the diagonal product.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the vector has more entries than there are rows</span>
+<span class="sd">          in the matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">B</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The vector `a` must have the same number of entries &quot;</span>
+                         <span class="s2">&quot;as there are rows in the matrix `B`.&quot;</span> <span class="p">)</span>
+    <span class="n">dp</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)):</span>
+        <span class="n">dp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">B</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+    <span class="n">dp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dp</span>
+
+<span class="k">def</span> <span class="nf">_H</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="n">V</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Constructs the hamiltonian matrix HW.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        s (list of int): The number of samples points along each </span>
+<span class="sd">          basis vector.</span>
+<span class="sd">        R (numpy.ndarray): The basis vectors for the unit cell.</span>
+<span class="sd">        W (numpy.ndarray): A matrix containing the expansion coefficients </span>
+<span class="sd">          for the wavefunctions</span>
+<span class="sd">        V (function, optional): The function of the potential.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HW (numpy.ndarray): The hamiltonian matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">pydft.poisson</span> <span class="k">import</span> <span class="n">_B_operator</span><span class="p">,</span> <span class="n">_B_dag_operator</span><span class="p">,</span> <span class="n">_L_operator</span>
+    
+    <span class="k">if</span> <span class="n">V</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span> <span class="c1">#pragma: no cover</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">_sho_V</span>
+
+    <span class="n">LW</span> <span class="o">=</span> <span class="n">_L_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">W</span><span class="p">)</span>
+    <span class="n">Vd</span> <span class="o">=</span> <span class="n">_Vdual</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">V</span> <span class="o">=</span> <span class="n">V</span><span class="p">)</span>
+
+    <span class="n">IW</span> <span class="o">=</span> <span class="n">_B_dag_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">_diagprod</span><span class="p">(</span><span class="n">Vd</span><span class="p">,</span><span class="n">_B_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">W</span><span class="p">)))</span>
+
+    <span class="n">HW</span> <span class="o">=</span> <span class="o">-</span><span class="n">LW</span><span class="o">/</span><span class="mf">2.</span> <span class="o">+</span> <span class="n">IW</span>
+    
+    <span class="k">return</span> <span class="n">HW</span>
+
+<span class="k">def</span> <span class="nf">_getgrad</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="n">V</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finds the gradient of the input matrix.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        s (list of int): The number of samples points along each </span>
+<span class="sd">          basis vector.</span>
+<span class="sd">        R (numpy.ndarray): The basis vectors for the unit cell.</span>
+<span class="sd">        W (numpy.ndarray): A matrix containing the expansion coefficients </span>
+<span class="sd">          for the wavefunctions</span>
+<span class="sd">        V (function, optional): The function of the potential.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">       gradW (numpy.ndarray): The gradient of the matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">pydft.poisson</span> <span class="k">import</span> <span class="n">_O_operator</span>
+
+    <span class="k">if</span> <span class="n">V</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span> <span class="c1">#pragma: no cover</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">_sho_V</span>
+
+    <span class="n">HW</span> <span class="o">=</span> <span class="n">_H</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="n">V</span><span class="o">=</span><span class="n">V</span><span class="p">)</span>
+    <span class="n">Uinv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">W</span><span class="p">)),</span><span class="n">_O_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">W</span><span class="p">)))</span>
+    <span class="n">rest</span> <span class="o">=</span> <span class="n">_O_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Uinv</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">W</span><span class="o">.</span><span class="n">T</span><span class="p">),</span><span class="n">HW</span><span class="p">))))</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">HW</span> <span class="o">-</span> <span class="n">rest</span>
+
+    <span class="n">gradW</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span><span class="n">Uinv</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gradW</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_Y</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">W</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Normalizes the input matrix.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        s (list of int): The number of samples points along each </span>
+<span class="sd">          basis vector.</span>
+<span class="sd">        R (numpy.ndarray): The basis vectors for the unit cell.</span>
+<span class="sd">        W (numpy.ndarray): A matrix containing the expansion coefficients </span>
+<span class="sd">          for the wavefunctions</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Y (numpy.ndarray): The normalized expansion coefficients.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">pydft.poisson</span> <span class="k">import</span> <span class="n">_O_operator</span>
+
+    <span class="n">Uinv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">W</span><span class="o">.</span><span class="n">T</span><span class="p">),</span><span class="n">_O_operator</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">W</span><span class="p">))))</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W</span><span class="p">,</span><span class="n">Uinv</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Y</span>
+
+<span class="k">def</span> <span class="nf">_sd</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">W</span><span class="p">,</span> <span class="n">Nit</span><span class="o">=</span><span class="mi">20</span> <span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mi">3</span><span class="o">*</span><span class="mi">10</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">),</span> <span class="n">V</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">print_test</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An implementation of the steepest descent algorithm.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        s (list of int): The number of samples points along each </span>
+<span class="sd">          basis vector.</span>
+<span class="sd">        R (numpy.ndarray): The basis vectors for the unit cell.</span>
+<span class="sd">        W (numpy.ndarray): A matrix containing the expansion coefficients </span>
+<span class="sd">          for the wavefunctions</span>
+<span class="sd">        Nit (int, optional): The number of iterations to go through.</span>
+<span class="sd">        alpha (float): The weight that is to be applied to the updates </span>
+<span class="sd">          of the W matrix.</span>
+<span class="sd">        V (function, optional): The function of the potential.</span>
+<span class="sd">        print_test (boolean, optional): A boolean that indicates if the</span>
+<span class="sd">          updated energy should be printed or not.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        W (numpy.ndarray): The updated coefficient matrix.</span>
+<span class="sd">        E (float): The energy of the new wave functions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">if</span> <span class="n">V</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span> <span class="c1">#pragma: no cover</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">_sho_V</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nit</span><span class="p">):</span>
+        <span class="n">dW</span> <span class="o">=</span> <span class="n">_getgrad</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">V</span><span class="o">=</span><span class="n">V</span><span class="p">)</span>
+        <span class="n">W</span> <span class="o">-=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">dW</span>
+        <span class="n">En</span> <span class="o">=</span> <span class="n">_getE</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="n">V</span><span class="o">=</span><span class="n">V</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">print_test</span><span class="p">:</span> <span class="c1">#pragma: no cover</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;iteration&quot;</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="s2">&quot;energy&quot;</span><span class="p">,</span><span class="n">En</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">W</span><span class="p">,</span><span class="n">En</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_getPsi</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="n">V</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finds the solutions to the schrodinger equation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        s (list of int): The number of samples points along each </span>
+<span class="sd">          basis vector.</span>
+<span class="sd">        R (numpy.ndarray): The basis vectors for the unit cell.</span>
+<span class="sd">        W (numpy.ndarray): A matrix containing the expansion coefficients </span>
+<span class="sd">          for the wavefunctions</span>
+<span class="sd">        V (function, optional): The function of the potential.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Psi (numpy.ndarray): The eigensolutions to the schrodinger equation.</span>
+<span class="sd">        epsilon (numpy.ndarray): The eigenvalues of the solutions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">if</span> <span class="n">V</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span> <span class="c1">#pragma: no cover</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">_sho_V</span>
+
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">_Y</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">W</span><span class="p">)</span>
+    <span class="n">H</span> <span class="o">=</span><span class="n">_H</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">V</span><span class="o">=</span><span class="n">V</span><span class="p">)</span>
+
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">Y</span><span class="o">.</span><span class="n">T</span><span class="p">),</span><span class="n">_H</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">V</span><span class="o">=</span><span class="n">V</span><span class="p">))</span>
+    <span class="p">(</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">Psi</span><span class="p">)</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">Psi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">epsilon</span><span class="p">))</span>
+
+<div class="viewcode-block" id="schrodinger"><a class="viewcode-back" href="../../schrodinger.html#pydft.schrodinger.schrodinger">[docs]</a><span class="k">def</span> <span class="nf">schrodinger</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">s</span><span class="p">,</span> <span class="n">Ns</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">Nit</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span><span class="n">V</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Solves the schrodinger equation for the given potential.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        R (numpy.ndarray): The basis vectors for the unit cell.</span>
+<span class="sd">        s (list of int): The number of samples points along each </span>
+<span class="sd">          basis vector.</span>
+<span class="sd">        V (function, optional): The function that defines the potential.</span>
+<span class="sd">        Nit (int, optional): The number of steps for the steepest decent</span>
+<span class="sd">          algorithm.</span>
+<span class="sd">        Ns (int, optional): The number of states to be solved for.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Psi (numpy.ndarray): The wave function solutions of to the</span>
+<span class="sd">          schrodinger equation.</span>
+<span class="sd">        epsilon (numpy.ndarray): The energy eigenfunctions for the</span>
+<span class="sd">          schrodigner equation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">V</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span> <span class="c1">#pragma: no cover</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">_sho_V</span>
+        
+    <span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">,(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">),</span><span class="n">Ns</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">,(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">),</span><span class="n">Ns</span><span class="p">))</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span>
+    <span class="n">W</span> <span class="o">=</span> <span class="n">_Y</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">W</span><span class="p">)</span>
+    
+    <span class="n">W</span> <span class="o">=</span> <span class="n">_sd</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="n">Nit</span><span class="o">=</span><span class="n">Nit</span><span class="p">,</span><span class="n">V</span><span class="o">=</span><span class="n">V</span><span class="p">)</span>
+
+    <span class="p">(</span><span class="n">Psi</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">)</span> <span class="o">=</span> <span class="n">_getPsi</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="n">V</span><span class="o">=</span><span class="n">V</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">Psi</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pydft 1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Wiley Morgan.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+    </div>
+  </body>
+</html>
