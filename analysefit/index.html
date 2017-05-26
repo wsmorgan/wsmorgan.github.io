@@ -1,0 +1,525 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to analysefit’s documentation! &#8212; analyzefit .3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-analysefit-s-documentation">
+<h1>Welcome to analysefit’s documentation!<a class="headerlink" href="#welcome-to-analysefit-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+</div>
+<span class="target" id="module-analyzefit.analyze"></span><p>The main class for the analysis of a given fit.</p>
+<dl class="class">
+<dt id="analyzefit.analyze.analysis">
+<em class="property">class </em><code class="descclassname">analyzefit.analyze.</code><code class="descname">analysis</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>model</em>, <em>predict=None</em><span class="sig-paren">)</span><a class="headerlink" href="#analyzefit.analyze.analysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>The main class for the analysis of a given fit.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">model (object): The fitting model (the model must have a predict method).</p>
+<p>X (numpy.ndarray): The X valuse to be used for plots.</p>
+<dl class="docutils">
+<dt>predict (str): The name of the method that is equivalent to the sklearn predict </dt>
+<dd>function. Default = ‘predict’.</dd>
+</dl>
+<p class="last">y (numpy.ndarray): The y values to be used for plots.</p>
+</dd>
+<dt>Attributes:</dt>
+<dd><dl class="first last docutils">
+<dt>validate (object): Creates a residual vs fitted plot, a quatile plot, a </dt>
+<dd>spread vs location plot, and a leverage plot and prints the accuracy
+score to the screen.</dd>
+<dt>res_vs_fit (object): Creates a plot of the residuals vs the fittted </dt>
+<dd>values in an interactive bokeh figure.</dd>
+<dt>quantile (object): Creates a quantile plot for the fitted values in an </dt>
+<dd>interactive bokeh figure.</dd>
+<dt>spread_loc (object): Creates a plot of the spread in residuals vs the fitted </dt>
+<dd>values in an interactive bokeh figure.</dd>
+<dt>leverage (object): Creates a plot of the cooks distance and the influence vs </dt>
+<dd>the standardized residuals in an interactive bokeh figure.</dd>
+</dl>
+</dd>
+<dt>Examples:</dt>
+<dd><p class="first">The following examples show how to validate the fit of sklearn’s LinearRegression
+on the housing dataset. It shows how to generate each of the plots that can be used
+to verify the accuracy af a fit.</p>
+<p>&gt;&gt;&gt;&gt; import pandas as pd</p>
+<p>&gt;&gt;&gt;&gt; import numpy as np</p>
+<p>&gt;&gt;&gt;&gt; from sklearn.linear_model import LinearRegression</p>
+<p>&gt;&gt;&gt;&gt; from sklearn.cross_validation import train_test_split</p>
+<p>&gt;&gt;&gt;&gt; from sklearn.metrics import mean_squared_error, r2_score</p>
+<p>&gt;&gt;&gt;&gt; df = pd.read_csv(‘<a class="reference external" href="https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.data">https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.data</a>’, header=None,sep=”s+”)</p>
+<p>&gt;&gt;&gt;&gt; df.columns = [“CRIM”, “ZN”, “INDUS”, “CHAS”, “NOX”, “RM”, “AGE”, “DIS”, “RAD”, “TAX”, “PTRATIO”, “B”, “LSTAT”, “MEDV”]</p>
+<p>&gt;&gt;&gt;&gt; X = df.iloc[:,:-1].values</p>
+<p>&gt;&gt;&gt;&gt; y = df[[“MEDV”]].values</p>
+<p>&gt;&gt;&gt;&gt; X_train, X_test, y_train, y_test = train_test_split(X, y,</p>
+<p>&gt;&gt;&gt;&gt;          test_size=0.3, random_state=0)</p>
+<p>&gt;&gt;&gt;&gt; slr = LinearRegression()</p>
+<p>&gt;&gt;&gt;&gt; slr.fit(X_train,y_train)</p>
+<p>&gt;&gt;&gt;&gt; an = analyze.analysis(X_train, y_train, slr)</p>
+<p>&gt;&gt;&gt;&gt; an.validate()</p>
+<p>&gt;&gt;&gt;&gt; an.validate(X=X_test, y=y_test, metrics=[mean_squared_error, r2_score)</p>
+<p>&gt;&gt;&gt;&gt; an.res_vs_fit()</p>
+<p>&gt;&gt;&gt;&gt; an.quantile()</p>
+<p>&gt;&gt;&gt;&gt; an.spread_loc()</p>
+<p class="last">&gt;&gt;&gt;&gt; an.leverage()</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="analyzefit.analyze.analysis.leverage">
+<code class="descname">leverage</code><span class="sig-paren">(</span><em>X=None</em>, <em>y=None</em>, <em>pred=None</em>, <em>interact=True</em>, <em>show=True</em>, <em>title=None</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="headerlink" href="#analyzefit.analyze.analysis.leverage" title="Permalink to this definition">¶</a></dt>
+<dd><p>The spread-location, or scale-location, plot of the data.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first docutils">
+<dt>X (numpy.ndarray, optional): The dataset to make the plot for</dt>
+<dd>if different than the dataset used to initialize the method.</dd>
+<dt>y (numpy.ndarray, optional): The target values to make the plot for</dt>
+<dd>if different than the dataset used to initialize the method.</dd>
+<dt>pred (numpy.ndarray, optional): The predicted values to make the plot for</dt>
+<dd>if y and X are different than the dataset used to initialize the method.</dd>
+</dl>
+<p>interact (bool, optional): True if the plot is to be interactive.</p>
+<p>show (bool, optional): True if plot is to be displayed.</p>
+<dl class="docutils">
+<dt>ax (matplotlib.axes._subplots.AxesSubplot, optional): The subplot on which to </dt>
+<dd>drow the plot.</dd>
+</dl>
+<p class="last">title (str, optional): The title of the plot.</p>
+</dd>
+<dt>Rasises:</dt>
+<dd><dl class="first last docutils">
+<dt>ValueError: if the number of predictions is not the same as the number of </dt>
+<dd>target values or if the number of rows in the feature matrix is not the
+same as the number of targets.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd><dl class="first last docutils">
+<dt>fig (matplotlib.figure.Figure or bokeh.plotting.figure): An </dt>
+<dd>object containing the plot if show=False.</dd>
+</dl>
+</dd>
+<dt>Examples:</dt>
+<dd><p class="first">&gt;&gt;&gt;&gt; import pandas as pd</p>
+<p>&gt;&gt;&gt;&gt; import numpy as np</p>
+<p>&gt;&gt;&gt;&gt; from sklearn.linear_model import LinearRegression</p>
+<p>&gt;&gt;&gt;&gt; from sklearn.cross_validation import train_test_split</p>
+<p>&gt;&gt;&gt;&gt; from sklearn.metrics import mean_squared_error, r2_score</p>
+<p>&gt;&gt;&gt;&gt; df = pd.read_csv(‘<a class="reference external" href="https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.data">https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.data</a>’, header=None,sep=”s+”)</p>
+<p>&gt;&gt;&gt;&gt; df.columns = [“CRIM”, “ZN”, “INDUS”, “CHAS”, “NOX”, “RM”, “AGE”, “DIS”, “RAD”, “TAX”, “PTRATIO”, “B”, “LSTAT”, “MEDV”]</p>
+<p>&gt;&gt;&gt;&gt; X = df.iloc[:,:-1].values</p>
+<p>&gt;&gt;&gt;&gt; y = df[[“MEDV”]].values</p>
+<p>&gt;&gt;&gt;&gt; X_train, X_test, y_train, y_test = train_test_split(X, y,</p>
+<p>&gt;&gt;&gt;&gt;          test_size=0.3, random_state=0)</p>
+<p>&gt;&gt;&gt;&gt; slr = LinearRegression()</p>
+<p>&gt;&gt;&gt;&gt; slr.fit(X_train,y_train)</p>
+<p>&gt;&gt;&gt;&gt; an = analyze.analysis(X_train, y_train, slr)</p>
+<p>&gt;&gt;&gt;&gt; an.leverage()</p>
+<p>&gt;&gt;&gt;&gt; an.leverage(X=X_test,y=y_test,title=”Test values”)</p>
+<p class="last">&gt;&gt;&gt;&gt; an.leverage(X=X_test,pred=slr.predict(X_test),y=y_test,title=”Test values”)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="analyzefit.analyze.analysis.quantile">
+<code class="descname">quantile</code><span class="sig-paren">(</span><em>data=None</em>, <em>dist=None</em>, <em>interact=True</em>, <em>show=True</em>, <em>title=None</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="headerlink" href="#analyzefit.analyze.analysis.quantile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a quantile plot of the predictions against the desired distribution.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first docutils">
+<dt>data (numpy.ndarray, optional): The user supplied data for the quantile plot.</dt>
+<dd>If None then the model predictions will be used.</dd>
+<dt>dist (str or numpy.ndarray, optional): The distribution to be compared to. Either </dt>
+<dd>‘Normal’, ‘Uniform’, or a numpy array of the user defined distribution.</dd>
+</dl>
+<p>interact (bool, optional): True if the plot is to be interactive.</p>
+<p>show (bool, optional): True if plot is to be displayed.</p>
+<dl class="docutils">
+<dt>ax (matplotlib.axes._subplots.AxesSubplot, optional): The subplot on which to </dt>
+<dd>drow the plot.</dd>
+</dl>
+<p class="last">title (str, optional): The title of the plot.</p>
+</dd>
+<dt>Rasises:</dt>
+<dd>ValueError: if data and the distribution are of different lengths.</dd>
+<dt>Returns:</dt>
+<dd><dl class="first last docutils">
+<dt>fig (matplotlib.figure.Figure or bokeh.plotting.figure): An </dt>
+<dd>object containing the plot if show=False.</dd>
+</dl>
+</dd>
+<dt>Examples:</dt>
+<dd><p class="first">&gt;&gt;&gt;&gt; import pandas as pd</p>
+<p>&gt;&gt;&gt;&gt; import numpy as np</p>
+<p>&gt;&gt;&gt;&gt; from sklearn.linear_model import LinearRegression</p>
+<p>&gt;&gt;&gt;&gt; from sklearn.cross_validation import train_test_split</p>
+<p>&gt;&gt;&gt;&gt; from sklearn.metrics import mean_squared_error, r2_score</p>
+<p>&gt;&gt;&gt;&gt; df = pd.read_csv(‘<a class="reference external" href="https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.data">https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.data</a>’, header=None,sep=”s+”)</p>
+<p>&gt;&gt;&gt;&gt; df.columns = [“CRIM”, “ZN”, “INDUS”, “CHAS”, “NOX”, “RM”, “AGE”, “DIS”, “RAD”, “TAX”, “PTRATIO”, “B”, “LSTAT”, “MEDV”]</p>
+<p>&gt;&gt;&gt;&gt; X = df.iloc[:,:-1].values</p>
+<p>&gt;&gt;&gt;&gt; y = df[[“MEDV”]].values</p>
+<p>&gt;&gt;&gt;&gt; X_train, X_test, y_train, y_test = train_test_split(X, y,</p>
+<p>&gt;&gt;&gt;&gt;          test_size=0.3, random_state=0)</p>
+<p>&gt;&gt;&gt;&gt; slr = LinearRegression()</p>
+<p>&gt;&gt;&gt;&gt; slr.fit(X_train,y_train)</p>
+<p>&gt;&gt;&gt;&gt; an = analyze.analysis(X_train, y_train, slr)</p>
+<p>&gt;&gt;&gt;&gt; an.quantile()</p>
+<p>&gt;&gt;&gt;&gt; an.quantile(data=y_test,dist=”uniform”,title=”Test values vs uniform distribution”)</p>
+<p class="last">&gt;&gt;&gt;&gt; an.quantile(data=y_test,dist=np.random.samples((len(y_test))))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="analyzefit.analyze.analysis.res_vs_fit">
+<code class="descname">res_vs_fit</code><span class="sig-paren">(</span><em>X=None</em>, <em>y=None</em>, <em>pred=None</em>, <em>interact=True</em>, <em>show=True</em>, <em>ax=None</em>, <em>title=None</em><span class="sig-paren">)</span><a class="headerlink" href="#analyzefit.analyze.analysis.res_vs_fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes the residual vs fitted values plot.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first docutils">
+<dt>X (numpy.ndarray, optional): The dataset to make the plot for</dt>
+<dd>if different than the dataset used to initialize the method.</dd>
+<dt>y (numpy.ndarray, optional): The target values to make the plot for</dt>
+<dd>if different than the dataset used to initialize the method.</dd>
+<dt>pred (numpy.ndarray, optional): The predicted values to make the plot for</dt>
+<dd>if y and X are different than the dataset used to initialize the method.</dd>
+</dl>
+<p>interact (bool, optional): True if the plot is to be interactive.</p>
+<p>show (bool, optional): True if plot is to be displayed.</p>
+<dl class="docutils">
+<dt>ax (matplotlib.axes._subplots.AxesSubplot, optional): The subplot on which to </dt>
+<dd>drow the plot.</dd>
+</dl>
+<p class="last">title (str, optional): The title of the plot.</p>
+</dd>
+<dt>Returns:</dt>
+<dd><dl class="first last docutils">
+<dt>fig (matplotlib.figure.Figure or bokeh.plotting.figure): An </dt>
+<dd>object containing the plot if show=False.</dd>
+</dl>
+</dd>
+<dt>Examples:</dt>
+<dd><p class="first">&gt;&gt;&gt;&gt; import pandas as pd</p>
+<p>&gt;&gt;&gt;&gt; import numpy as np</p>
+<p>&gt;&gt;&gt;&gt; from sklearn.linear_model import LinearRegression</p>
+<p>&gt;&gt;&gt;&gt; from sklearn.cross_validation import train_test_split</p>
+<p>&gt;&gt;&gt;&gt; from sklearn.metrics import mean_squared_error, r2_score</p>
+<p>&gt;&gt;&gt;&gt; df = pd.read_csv(‘<a class="reference external" href="https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.data">https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.data</a>’, header=None,sep=”s+”)</p>
+<p>&gt;&gt;&gt;&gt; df.columns = [“CRIM”, “ZN”, “INDUS”, “CHAS”, “NOX”, “RM”, “AGE”, “DIS”, “RAD”, “TAX”, “PTRATIO”, “B”, “LSTAT”, “MEDV”]</p>
+<p>&gt;&gt;&gt;&gt; X = df.iloc[:,:-1].values</p>
+<p>&gt;&gt;&gt;&gt; y = df[[“MEDV”]].values</p>
+<p>&gt;&gt;&gt;&gt; X_train, X_test, y_train, y_test = train_test_split(X, y,</p>
+<p>&gt;&gt;&gt;&gt;          test_size=0.3, random_state=0)</p>
+<p>&gt;&gt;&gt;&gt; slr = LinearRegression()</p>
+<p>&gt;&gt;&gt;&gt; slr.fit(X_train,y_train)</p>
+<p>&gt;&gt;&gt;&gt; an = analyze.analysis(X_train, y_train, slr)</p>
+<p>&gt;&gt;&gt;&gt; an.res_vs_fit()</p>
+<p>&gt;&gt;&gt;&gt; an.res_vs_fit(X=X_test,y=y_test,title=”Test values”)</p>
+<p class="last">&gt;&gt;&gt;&gt; an.res_vs_fit(pred=slr.predict(X_test),y=y_test,title=”Test values”)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="analyzefit.analyze.analysis.spread_loc">
+<code class="descname">spread_loc</code><span class="sig-paren">(</span><em>X=None</em>, <em>y=None</em>, <em>pred=None</em>, <em>interact=True</em>, <em>show=True</em>, <em>title=None</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="headerlink" href="#analyzefit.analyze.analysis.spread_loc" title="Permalink to this definition">¶</a></dt>
+<dd><p>The spread-location, or scale-location, plot of the data.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first docutils">
+<dt>X (numpy.ndarray, optional): The dataset to make the plot for</dt>
+<dd>if different than the dataset used to initialize the method.</dd>
+<dt>y (numpy.ndarray, optional): The target values to make the plot for</dt>
+<dd>if different than the dataset used to initialize the method.</dd>
+<dt>pred (numpy.ndarray, optional): The predicted values to make the plot for</dt>
+<dd>if y and X are different than the dataset used to initialize the method.</dd>
+</dl>
+<p>interact (bool, optional): True if the plot is to be interactive.</p>
+<p>show (bool, optional): True if plot is to be displayed.</p>
+<dl class="docutils">
+<dt>ax (matplotlib.axes._subplots.AxesSubplot, optional): The subplot on which to </dt>
+<dd>drow the plot.</dd>
+</dl>
+<p class="last">title (str, optional): The title of the plot.</p>
+</dd>
+<dt>Returns:</dt>
+<dd><dl class="first last docutils">
+<dt>fig (matplotlib.figure.Figure or bokeh.plotting.figure): An </dt>
+<dd>object containing the plot if show=False.</dd>
+</dl>
+</dd>
+<dt>Examples:</dt>
+<dd><p class="first">&gt;&gt;&gt;&gt; import pandas as pd</p>
+<p>&gt;&gt;&gt;&gt; import numpy as np</p>
+<p>&gt;&gt;&gt;&gt; from sklearn.linear_model import LinearRegression</p>
+<p>&gt;&gt;&gt;&gt; from sklearn.cross_validation import train_test_split</p>
+<p>&gt;&gt;&gt;&gt; from sklearn.metrics import mean_squared_error, r2_score</p>
+<p>&gt;&gt;&gt;&gt; df = pd.read_csv(‘<a class="reference external" href="https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.data">https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.data</a>’, header=None,sep=”s+”)</p>
+<p>&gt;&gt;&gt;&gt; df.columns = [“CRIM”, “ZN”, “INDUS”, “CHAS”, “NOX”, “RM”, “AGE”, “DIS”, “RAD”, “TAX”, “PTRATIO”, “B”, “LSTAT”, “MEDV”]</p>
+<p>&gt;&gt;&gt;&gt; X = df.iloc[:,:-1].values</p>
+<p>&gt;&gt;&gt;&gt; y = df[[“MEDV”]].values</p>
+<p>&gt;&gt;&gt;&gt; X_train, X_test, y_train, y_test = train_test_split(X, y,</p>
+<p>&gt;&gt;&gt;&gt;          test_size=0.3, random_state=0)</p>
+<p>&gt;&gt;&gt;&gt; slr = LinearRegression()</p>
+<p>&gt;&gt;&gt;&gt; slr.fit(X_train,y_train)</p>
+<p>&gt;&gt;&gt;&gt; an = analyze.analysis(X_train, y_train, slr)</p>
+<p>&gt;&gt;&gt;&gt; an.spread_loc()</p>
+<p>&gt;&gt;&gt;&gt; an.spread_loc(X=X_test,y=y_test,title=”Test values”)</p>
+<p class="last">&gt;&gt;&gt;&gt; an.spread_loc(pred=slr.predict(X_test),y=y_test,title=”Test values”)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="analyzefit.analyze.analysis.validate">
+<code class="descname">validate</code><span class="sig-paren">(</span><em>X=None</em>, <em>y=None</em>, <em>pred=None</em>, <em>dist=None</em>, <em>metric=None</em>, <em>testing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#analyzefit.analyze.analysis.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>The spread-location, or scale-location, plot of the data.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first docutils">
+<dt>X (numpy.ndarray, optional): The dataset to make the plot for</dt>
+<dd>if different than the dataset used to initialize the method.</dd>
+<dt>y (numpy.ndarray, optional): The target values to make the plot for</dt>
+<dd>if different than the dataset used to initialize the method.</dd>
+<dt>pred (numpy.ndarray, optional): The predicted values to make the plot for</dt>
+<dd>if y and X are different than the dataset used to initialize the method.</dd>
+<dt>dist (str or numpy.ndarray, optional): The distribution to be compared to. Either </dt>
+<dd>‘Normal’, ‘Uniform’, or a numpy array of the user defined distribution.</dd>
+<dt>metric (function or list of functions, optional): The functions used to</dt>
+<dd>determine how accurate the fit is.</dd>
+</dl>
+<p class="last">testing (bool, optional): True if this is a unit test.</p>
+</dd>
+<dt>Returns:</dt>
+<dd>score (list of float): The scores from each of the metrics of in testing mode.</dd>
+<dt>Examples:</dt>
+<dd><p class="first">&gt;&gt;&gt;&gt; import pandas as pd</p>
+<p>&gt;&gt;&gt;&gt; import numpy as np</p>
+<p>&gt;&gt;&gt;&gt; from sklearn.linear_model import LinearRegression</p>
+<p>&gt;&gt;&gt;&gt; from sklearn.cross_validation import train_test_split</p>
+<p>&gt;&gt;&gt;&gt; from sklearn.metrics import mean_squared_error, r2_score</p>
+<p>&gt;&gt;&gt;&gt; df = pd.read_csv(‘<a class="reference external" href="https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.data">https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.data</a>’, header=None,sep=”s+”)</p>
+<p>&gt;&gt;&gt;&gt; df.columns = [“CRIM”, “ZN”, “INDUS”, “CHAS”, “NOX”, “RM”, “AGE”, “DIS”, “RAD”, “TAX”, “PTRATIO”, “B”, “LSTAT”, “MEDV”]</p>
+<p>&gt;&gt;&gt;&gt; X = df.iloc[:,:-1].values</p>
+<p>&gt;&gt;&gt;&gt; y = df[[“MEDV”]].values</p>
+<p>&gt;&gt;&gt;&gt; X_train, X_test, y_train, y_test = train_test_split(X, y,</p>
+<p>&gt;&gt;&gt;&gt;          test_size=0.3, random_state=0)</p>
+<p>&gt;&gt;&gt;&gt; slr = LinearRegression()</p>
+<p>&gt;&gt;&gt;&gt; slr.fit(X_train,y_train)</p>
+<p>&gt;&gt;&gt;&gt; an = analyze.analysis(X_train, y_train, slr)</p>
+<p>&gt;&gt;&gt;&gt; an.validate()</p>
+<p class="last">&gt;&gt;&gt;&gt; an.validate(X=X_test, y=y_test, metrics=[mean_squared_error, r2_score)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-analyzefit.manipulate"></span><p>Tools for data minipulation.</p>
+<dl class="function">
+<dt id="analyzefit.manipulate.cooks_dist">
+<code class="descclassname">analyzefit.manipulate.</code><code class="descname">cooks_dist</code><span class="sig-paren">(</span><em>y</em>, <em>pred</em>, <em>features</em><span class="sig-paren">)</span><a class="headerlink" href="#analyzefit.manipulate.cooks_dist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the Cooks distance for the data in the. See:
+<a class="reference external" href="https://en.wikipedia.org/wiki/Cook%27s_distance">https://en.wikipedia.org/wiki/Cook%27s_distance</a></p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>y (numpy.ndarray): An array containing the correct values of the model.
+pred (numpy.ndarray): An array containing the predicted values of the model.
+features (numpy.ndarray): An array containing the features of the regression model.</dd>
+<dt>Returns:</dt>
+<dd>dist (numpy.ndarray): An array of the cooks distance for each point in the input data.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="analyzefit.manipulate.hat_diags">
+<code class="descclassname">analyzefit.manipulate.</code><code class="descname">hat_diags</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#analyzefit.manipulate.hat_diags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the diagonals of the hat matrix for the features in X.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>X (numpy.ndarray): An array containing the features of the regression model.</dd>
+<dt>Returns:</dt>
+<dd>hat_diags (numpy.ndarray): The diagonals of the hat matrix.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="analyzefit.manipulate.residual">
+<code class="descclassname">analyzefit.manipulate.</code><code class="descname">residual</code><span class="sig-paren">(</span><em>y</em>, <em>pred</em><span class="sig-paren">)</span><a class="headerlink" href="#analyzefit.manipulate.residual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the residual of the actual vs the predicted values.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>y (numpy.ndarray): An array containing the correct values of the model.
+pred (numpy.ndarray): An array containing the predicted values of the model.</dd>
+<dt>Returns:</dt>
+<dd>residaul (numpy.ndarray): The residual of the data (y-pred).</dd>
+<dt>Raises:</dt>
+<dd>ValueError: Raises a value error if y and pred don’t have the same number of elements.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="analyzefit.manipulate.std_residuals">
+<code class="descclassname">analyzefit.manipulate.</code><code class="descname">std_residuals</code><span class="sig-paren">(</span><em>y</em>, <em>pred</em><span class="sig-paren">)</span><a class="headerlink" href="#analyzefit.manipulate.std_residuals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the residual of the actual vs the predicted values.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>y (numpy.ndarray): An array containing the correct values of the model.
+pred (numpy.ndarray): An array containing the predicted values of the model.</dd>
+<dt>Returns:</dt>
+<dd>standardized_residaul (numpy.ndarray): The standardazied residual of the data (y-pred).</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-analyzefit.plotting"></span><dl class="function">
+<dt id="analyzefit.plotting.scatter">
+<code class="descclassname">analyzefit.plotting.</code><code class="descname">scatter</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>show_plt=True</em>, <em>x_label=None</em>, <em>y_label=None</em>, <em>label=None</em>, <em>title=None</em>, <em>fig=None</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="headerlink" href="#analyzefit.plotting.scatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a standard matplotlib style scatter plot.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>x (numpy.ndarray): The data for the x-axis.
+y (numpy.ndarray): The data for the y-axis.
+show (bool, optional): True if plot is to be shown.
+x_label (str, optional): The x-axis label.
+y_label (str, optional): The y-axis label.
+label (str, optional): The data trend label.
+title (str, optional): The plot title.
+fig (matplotlib.figure.Figure, optional): An initial figure to add points too.
+ax (matplotlib.axes._subplots.AxesSubplot, optional): A subplot object to plot on.</dd>
+<dt>Returns:</dt>
+<dd>fig (matplotlib object): Returns the matplotlib object if show = False.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="analyzefit.plotting.scatter_with_hover">
+<code class="descclassname">analyzefit.plotting.</code><code class="descname">scatter_with_hover</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>in_notebook=True</em>, <em>show_plt=True</em>, <em>fig=None</em>, <em>name=None</em>, <em>marker=’o’</em>, <em>fig_width=500</em>, <em>fig_height=500</em>, <em>x_label=None</em>, <em>y_label=None</em>, <em>title=None</em>, <em>color=’blue’</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#analyzefit.plotting.scatter_with_hover" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots an interactive scatter plot of <cite>x</cite> vs <cite>y</cite> using bokeh, with automatic
+tooltips showing columns from <cite>df</cite>. Modified from: 
+<a class="reference external" href="http://blog.rtwilson.com/bokeh-plots-with-dataframe-based-tooltips/">http://blog.rtwilson.com/bokeh-plots-with-dataframe-based-tooltips/</a></p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">x (numpy.ndarray): The data for the x-axis.
+y (numpy.ndarray): The data for the y-axis.</p>
+<dl class="docutils">
+<dt>fig (bokeh.plotting.Figure, optional): Figure on which to plot </dt>
+<dd>(if not given then a new figure will be created)</dd>
+</dl>
+<p class="last">name (str, optional): Series name to give to the scattered data
+marker (str, optional): Name of marker to use for scatter plot</p>
+</dd>
+<dt>Returns:</dt>
+<dd><dl class="first last docutils">
+<dt>fig (bokeh.plotting.Figure): Figure (the same as given, or the newly created figure) </dt>
+<dd>if show is False</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to analysefit’s documentation!</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Wiley S Morgan.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
