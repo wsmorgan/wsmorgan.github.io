@@ -1,0 +1,158 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Attributes &#8212; pyniggli 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Examples" href="examples.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Examples"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pyniggli 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="attributes">
+<h1>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h1>
+<p>Pyniggli is a very simple code. It doesn’t take very many arguments
+and uses only a handful of functions. For examples of how to use the
+code to reduce a cell see :doc: <cite>examples</cite>.</p>
+<span class="target" id="module-pyniggli.niggli"></span><p>Contains the main class and functions for the niggli reduced
+cell. As described in the papers found at:</p>
+<p><a class="reference external" href="https://www.mendeley.com/viewer/?fileId=74bc20b9-a7a5-8e3d-4608-6ce09ea453e0&amp;documentId=7b2a0aec-6dcf-3475-8834-96ddbb760220">https://www.mendeley.com/viewer/?fileId=74bc20b9-a7a5-8e3d-4608-6ce09ea453e0&amp;documentId=7b2a0aec-6dcf-3475-8834-96ddbb760220</a></p>
+<p><a class="reference external" href="https://www.mendeley.com/viewer/?fileId=74bc20b9-a7a5-8e3d-4608-6ce09ea453e0&amp;documentId=7b2a0aec-6dcf-3475-8834-96ddbb760220">https://www.mendeley.com/viewer/?fileId=74bc20b9-a7a5-8e3d-4608-6ce09ea453e0&amp;documentId=7b2a0aec-6dcf-3475-8834-96ddbb760220</a></p>
+<p>Author: Wiley S. Morgan 2017</p>
+<dl class="class">
+<dt id="pyniggli.niggli.reduced_cell">
+<em class="property">class </em><code class="descclassname">pyniggli.niggli.</code><code class="descname">reduced_cell</code><span class="sig-paren">(</span><em>A</em>, <em>eps=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyniggli/niggli.html#reduced_cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyniggli.niggli.reduced_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class contains the methods necessary to reduce a lattice to
+it’s niggli reduced cell.</p>
+<dl class="attribute">
+<dt id="pyniggli.niggli.reduced_cell.original">
+<code class="descname">original</code><a class="headerlink" href="#pyniggli.niggli.reduced_cell.original" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy ndarray</em> – The original cell vectors.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyniggli.niggli.reduced_cell.niggli">
+<code class="descname">niggli</code><a class="headerlink" href="#pyniggli.niggli.reduced_cell.niggli" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy ndarray</em> – The niggli reduced cell vectors.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyniggli.niggli.reduced_cell.C">
+<code class="descname">C</code><a class="headerlink" href="#pyniggli.niggli.reduced_cell.C" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy ndarray</em> – The transformation matrix to transform from the original
+to the niggli cell (O’ = O C).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyniggli.niggli.reduced_cell.volume">
+<code class="descname">volume</code><a class="headerlink" href="#pyniggli.niggli.reduced_cell.volume" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> – The volume of the cell.</p>
+</dd></dl>
+
+<p class="rubric">Examples</p>
+<p>The following examples show how to generate a niggli reduced cell.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="n">an</span> <span class="n">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyniggli.niggli</span> <span class="k">import</span> <span class="n">reduced_cell</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpase</span><span class="p">([[</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.5</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.5</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span> <span class="o">=</span> <span class="n">reduced_cell</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">C</span><span class="p">))</span>
+<span class="go">    array([[-0.5,0,-0.5],[-0.5,0,0.5],[0,-3,0]])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="examples.html"
+                        title="previous chapter">Examples</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/methods.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Examples"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pyniggli 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Wiley S. Morgan.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+    </div>
+  </body>
+</html>
